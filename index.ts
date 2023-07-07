@@ -17,12 +17,12 @@ function findGitRoot(start: string | string[]) {
     throw new Error('.git/ not found in path')
   }
   start.pop()
-  var dir = start.join(sep)
-  var fullPath = join(dir, '.git')
+  const dir = start.join(sep)
+  const fullPath = join(dir, '.git')
   if (existsSync(fullPath)) {
     if (!lstatSync(fullPath).isDirectory()) {
-      var content = readFileSync(fullPath, { encoding: 'utf-8' })
-      var match = /^gitdir: (.*)\s*$/.exec(content)
+      const content = readFileSync(fullPath, { encoding: 'utf-8' })
+      const match = /^gitdir: (.*)\s*$/.exec(content)
       if (match) {
         return normalize(match[1])
       }
