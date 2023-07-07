@@ -1,8 +1,34 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, lstatSync } from 'node:fs';
 import { readFile } from 'node:fs/promises'
-// import * as find from 'find-up'
+import { normalize, sep, join, relative } from 'node:path'
 
-const findUp = await import('find-up')
+function findGitRoot(start: string | string[]) {
+  if (typeof start === 'string') {
+    if (start[start.length - 1] !== sep) {
+      start += sep
+    }
+    start = normalize(start)
+    start = start.split(sep)
+  }
+  if (!start.length) {
+    throw new Error('.git/ not found in path')
+  }
+  start.pop()
+  var dir = start.join(sep)
+  var fullPath = join(dir, '.git')
+  if (existsSync(fullPath)) {
+    if (!lstatSync(fullPath).isDirectory()) {
+      var content = readFileSync(fullPath, { encoding: 'utf-8' })
+      var match = /^gitdir: (.*)\s*$/.exec(content)
+      if (match) {
+        return normalize(match[1])
+      }
+    }
+    return normalize(fullPath)
+  } else {
+    return findGitRoot(start)
+  }
+}
 
 function sync(cwd: string): string {
   const fileBuffer = readFileSync(gitHeadPath(cwd))
@@ -15,8 +41,6 @@ function branch(cwd: string | Function, callback?: Function): void | Promise<str
     callback = cwd;
     cwd = process.cwd();
   }
-
-
 
   if (typeof callback === 'function') {
     try {
@@ -33,18 +57,14 @@ function branch(cwd: string | Function, callback?: Function): void | Promise<str
 
 branch.sync = sync
 
-
-
 function parseBranch(buf: Buffer) {
   const match = /ref: refs\/heads\/([^\n]+)/.exec(buf.toString());
   return match ? match[1] : null;
 }
 
 function gitHeadPath(cwd: string): string {
-  const filepath = findUp.findUpSync('.git/HEAD', { cwd: cwd });
-
-  if (typeof filepath !== 'string') throw new Error('Unable to find .git/HEAD. Invalid path returned')
-  if (!existsSync(filepath)) throw new Error('.git/HEAD does not exist');
+  const filepath = join(findGitRoot(cwd), "HEAD")
+  if (!existsSync(filepath)) throw new Error(`${relative(cwd, filepath)} does not exist`);
   return filepath;
 }
 

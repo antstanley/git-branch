@@ -36,7 +36,5 @@
     "branch",
     "git"
   ],
-  "dependencies": {
-    "find-up": "^6.3.0"
-  }
+  "dependencies": {}
 }
