@@ -1,22 +1,24 @@
 {
-  "name": "git-branch",
-  "description": "Get the current branch from the local git repository.",
-  "version": "2.0.1",
-  "homepage": "https://github.com/jonschlinkert/git-branch",
-  "author": "Jon Schlinkert (http://github.com/https://github.com/jonschlinkert)",
-  "repository": "jonschlinkert/git-branch",
+  "name": "git-branch-ts",
+  "description": "Get the current branch from the local git repository with full TypeScript and ES module support.",
+  "version": "3.0.",
+  "homepage": "https://github.com/antstanley/git-branch-ts",
+  "author": "Ant Stanley (https://github.com/antstanley) & Jon Schlinkert (https://github.com/jonschlinkert)",
+  "repository": "antstanley/git-branch-ts",
   "bugs": {
-    "url": "https://github.com/jonschlinkert/git-branch/issues"
+    "url": "https://github.com/antstanley/git-branch-ts/issues"
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.mjs",
+    "index.ts"
   ],
-  "main": "index.js",
+  "main": "index",
   "engines": {
     "node": ">=16"
   },
   "scripts": {
+    "lint": "eslint",
     "test": "vitest"
   },
   "type": "module",
@@ -27,7 +29,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.1",
     "eslint-plugin-promise": "^6.1.1",
-    "gulp-format-md": "^2.0.0",
     "typescript": "^5.1.6",
     "vitest": "^0.33.0"
   },
@@ -35,26 +36,6 @@
     "branch",
     "git"
   ],
-  "verb": {
-    "toc": false,
-    "layout": "default",
-    "tasks": [
-      "readme"
-    ],
-    "plugins": [
-      "gulp-format-md"
-    ],
-    "related": {
-      "list": [
-        "git-add-remote",
-        "git-user-name",
-        "github-base"
-      ]
-    },
-    "lint": {
-      "reflinks": true
-    }
-  },
   "dependencies": {
     "find-up": "^6.3.0"
   }
