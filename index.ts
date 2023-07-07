@@ -2,7 +2,6 @@ import { readFileSync, existsSync, lstatSync } from 'node:fs';
 import { readFile } from 'node:fs/promises'
 import { normalize, sep, join, relative } from 'node:path'
 
-
 // Code copied and updated from https://github.com/banyudu/find-git-root
 // Added to resolve issues fixed in unmerged PR https://github.com/jonschlinkert/git-branch/pull/14 and remove last remaining runtime dependency
 function findGitRoot(start: string | string[]) {
@@ -70,9 +69,5 @@ function gitHeadPath(cwd: string): string {
   if (!existsSync(filepath)) throw new Error(`${relative(cwd, filepath)} does not exist`);
   return filepath;
 }
-
-/**
- * Expose `branch`
- */
 
 export default branch
