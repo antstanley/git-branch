@@ -2,42 +2,66 @@
 
 import { spawnSync } from 'node:child_process';
 import { expect, beforeAll, afterAll, describe, test } from 'vitest'
-import { join } from 'path'
-import fs from 'fs'
-import branch from '../index'
+import { join } from 'node:path'
+import { mkdirSync, existsSync, rmSync } from 'node:fs'
+import branch from '../index.js'
 
+const fixturesBase = join(process.cwd(), 'fixtures');
 
-const fixtures = join(process.cwd(), 'fixtures');
+function create(folderName: string, worktree?: boolean) {
+  if (existsSync(folderName)) rmSync(folderName, { recursive: true })
+  mkdirSync(folderName, { recursive: true })
 
-function create(folderName: string) {
-  console.log('create!')
-  if (fs.existsSync(folderName)) fs.rmSync(folderName, { recursive: true })
-  fs.mkdirSync(folderName)
-  spawnSync('git', ['init', '-q', '--initial-branch=main'], { cwd: folderName })
+  if (worktree) {
+    spawnSync('git', ['worktree', 'add', '--initial-branch=main', folderName], { cwd: folderName })
+  } else {
+    spawnSync('git', ['init', '-q', '--initial-branch=main'], { cwd: folderName })
+  }
 }
 
 function cleanUp(folderName: string) {
-  if (fs.existsSync(folderName)) fs.rmSync(folderName, { recursive: true })
+  if (existsSync(folderName)) rmSync(folderName, { recursive: true })
 }
 
-describe('git-branch', async () => {
+afterAll(() => { cleanUp(fixturesBase) })
 
-  beforeAll(() => create(fixtures));
-  afterAll(() => cleanUp(fixtures));
+describe('git-branch base', async () => {
+  const fixturesGit = join(fixturesBase, 'git');
 
-  test('should get branch (sync)', () => expect(branch.sync(fixtures)).toBe('main'));
+  beforeAll(() => create(fixturesGit));
+  afterAll(() => cleanUp(fixturesGit));
+
+  test('should get branch (sync)', () => expect(branch.sync(fixturesGit)).toBe('main'));
 
   test('should get branch (promise)', async () => {
-    const branchResponse = await branch(fixtures)
+    const branchResponse = await branch(fixturesGit)
     return expect(branchResponse).toBe('main');
   });
 
-  test('should get branch (async)', function(cb: Function) {
-    branch(fixtures, function(err: Error, res: string) {
-
+  test('should get branch (callback)', () => {
+    branch(fixturesGit, function(err: Error, res: string) {
       expect(res).toBe('main');
       expect(err).toBeNull()
+    });
+  });
+});
 
+describe('git-branch-ts worktree support', async () => {
+  const fixturesWorktree = join(fixturesBase, 'worktree');
+  beforeAll(() => create(fixturesWorktree));
+  afterAll(() => cleanUp(fixturesWorktree));
+
+  test('should get branch (sync)', () => expect(branch.sync(fixturesWorktree)).toBe('main'));
+
+  test('should get branch (promise)', async () => {
+    const branchResponse = await branch(fixturesWorktree)
+    return expect(branchResponse).toBe('main');
+  });
+
+  test('should get branch (callback)', () => {
+    branch(fixturesWorktree, function(err: Error, res: string) {
+      expect(res).toBe('main');
+      expect(err).toBeNull()
     });
   });
 });

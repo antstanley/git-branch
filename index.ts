@@ -2,6 +2,9 @@ import { readFileSync, existsSync, lstatSync } from 'node:fs';
 import { readFile } from 'node:fs/promises'
 import { normalize, sep, join, relative } from 'node:path'
 
+
+// Code copied and updated from https://github.com/banyudu/find-git-root
+// Added to resolve issues fixed in unmerged PR https://github.com/jonschlinkert/git-branch/pull/14 and remove last remaining runtime dependency
 function findGitRoot(start: string | string[]) {
   if (typeof start === 'string') {
     if (start[start.length - 1] !== sep) {
